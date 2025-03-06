@@ -3,6 +3,9 @@
   "dockerFile": "Dockerfile",
   "context": "..",
   "appPort": [8080], // Expone el puerto 8080 para tu aplicación
+  "runArgs": [
+    "--network=host" // Usa la red del host
+  ],
   "settings": {
     "terminal.integrated.shell.linux": "/bin/bash", // Usa bash como terminal
     "go.gopath": "/go", // Configura el GOPATH
