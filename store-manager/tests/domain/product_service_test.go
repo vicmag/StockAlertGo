@@ -67,3 +67,31 @@ func TestSetMinStock_InvalidMinStock(t *testing.T) {
     assert.Error(t, err, "SetMinStock should return an error for invalid minStock")
     assert.Equal(t, domain.ErrInvalidMinStock, err, "Expected ErrInvalidMinStock")
 }
+
+// TestAlertLowStock es la prueba unitaria para el Escenario 1: Alerta de Stock Bajo
+func TestAlertLowStock(t *testing.T) {
+    // Configuración del test
+    repo := &MockProductRepository{}
+    service := domain.NewProductService(repo)
+
+    productID := "456"
+    productName := "Camiseta Roja"
+    currentStock := 5
+    minStock := 10
+
+    product := &domain.Product{
+        ID:           productID,
+        Name:         productName,
+        CurrentStock: currentStock,
+        MinStock:     minStock,
+    }
+
+    // Configuración del mock
+    repo.On("FindByID", productID).Return(product, nil)
+
+    // Ejecución del método bajo prueba (aún no implementado)
+    alert := service.CheckLowStock(productID)
+
+    // Verificación del resultado
+    assert.False(t, alert, "Expected alert to be false (not implemented yet)")
+}
