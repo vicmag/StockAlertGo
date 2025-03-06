@@ -1,5 +1,9 @@
 package domain
 
+import (
+    "errors" // Importación del paquete errors
+)
+
 // ProductService contiene la lógica de negocio para gestionar productos
 type ProductService struct {
     repo ProductRepository
@@ -12,15 +16,19 @@ func NewProductService(repo ProductRepository) *ProductService {
 
 // SetMinStock establece el nivel mínimo de stock para un producto
 func (s *ProductService) SetMinStock(productID string, minStock int) error {
-    // Busca el producto por su ID
+    if minStock <= 0 {
+        return ErrInvalidMinStock // Refactor: Validación adicional para mejorar la robustez
+    }
+
     product, err := s.repo.FindByID(productID)
     if err != nil {
         return err
     }
 
-    // Actualiza el nivel mínimo de stock
     product.MinStock = minStock
-
-    // Guarda el producto actualizado
     return s.repo.Save(product)
 }
+
+// ErrInvalidMinStock es un error personalizado para niveles mínimos inválidos
+var ErrInvalidMinStock = errors.New("el nivel mínimo de stock debe ser mayor que cero")
+    

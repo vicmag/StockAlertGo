@@ -45,12 +45,25 @@ func TestSetMinStock(t *testing.T) {
 
     // Ejecución del método bajo prueba
     err := service.SetMinStock(productID, minStock)
-    if err != nil {
-        t.Fatalf("SetMinStock failed: %v", err)
-    }
+    assert.NoError(t, err, "SetMinStock should not return an error")
 
     // Verificación del resultado
     repo.AssertCalled(t, "FindByID", productID)
     repo.AssertCalled(t, "Save", product)
     assert.Equal(t, minStock, product.MinStock, "Expected MinStock to be %d, got %d", minStock, product.MinStock)
+}
+
+// TestSetMinStock_InvalidMinStock prueba el caso de un nivel mínimo inválido
+func TestSetMinStock_InvalidMinStock(t *testing.T) {
+    // Configuración del test
+    repo := &MockProductRepository{}
+    service := domain.NewProductService(repo)
+
+    productID := "123"
+    invalidMinStock := 0 // Nivel mínimo inválido
+
+    // Ejecución del método bajo prueba
+    err := service.SetMinStock(productID, invalidMinStock)
+    assert.Error(t, err, "SetMinStock should return an error for invalid minStock")
+    assert.Equal(t, domain.ErrInvalidMinStock, err, "Expected ErrInvalidMinStock")
 }
