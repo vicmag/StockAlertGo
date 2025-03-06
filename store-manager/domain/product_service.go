@@ -29,6 +29,12 @@ func (s *ProductService) SetMinStock(productID string, minStock int) error {
     return s.repo.Save(product)
 }
 
+// CheckLowStock verifica si el stock de un producto está por debajo del nivel mínimo
+func (s *ProductService) CheckLowStock(productID string) bool {
+    // Implementación vacía para que la prueba falle
+    return true
+}
+
 // ErrInvalidMinStock es un error personalizado para niveles mínimos inválidos
 var ErrInvalidMinStock = errors.New("el nivel mínimo de stock debe ser mayor que cero")
     
