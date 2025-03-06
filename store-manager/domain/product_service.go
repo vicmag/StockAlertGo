@@ -12,11 +12,6 @@ func NewProductService(repo ProductRepository) *ProductService {
 
 // SetMinStock establece el nivel mínimo de stock para un producto
 func (s *ProductService) SetMinStock(productID string, minStock int) error {
-    product, err := s.repo.FindByID(productID)
-    if err != nil {
-        return err
-    }
-    product.MinStock = minStock
-    return s.repo.Save(product)
+    // Implementación vacía para que la prueba falle
+    return nil
 }
-    
