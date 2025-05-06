@@ -1,0 +1,25 @@
+{
+  "name": "Go Development Container",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "appPort": [8080], // Expone el puerto 8080 para tu aplicación
+  "runArgs": [
+    "--network=host" // Usa la red del host
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash", // Usa bash como terminal
+    "go.gopath": "/go", // Configura el GOPATH
+    "go.goroot": "/usr/local/go", // Configura el GOROOT
+    "go.useLanguageServer": true, // Habilita el servidor de lenguaje de Go
+    "go.toolsEnvVars": {
+      "GO111MODULE": "on" // Habilita el uso de módulos de Go
+    }
+  },
+  "extensions": [
+    "golang.go", // Extensión oficial de Go para VSCode
+    "ms-vscode.makefile-tools", // Soporte para Makefile (opcional)
+    "github.copilot" // GitHub Copilot (opcional)
+  ],
+  "forwardPorts": [8080], // Reenvía el puerto 8080 al host
+  //"remoteUser": "vicmag" // Usa tu usuario local dentro del contenedor
+}
