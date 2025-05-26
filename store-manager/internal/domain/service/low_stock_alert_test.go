@@ -58,3 +58,24 @@ func TestIncrementStock(t *testing.T){
 	mockRepo.AssertExpectations(t)
 
 }
+
+func TestIncrementStock_ProductoNoEncontrado(t *testing.T){
+	// Arrange (configuración)
+	mockRepo := new(MockProductRepository)
+	productSvc := service.NewProductService(mockRepo)
+	productName := "ProductoInexistente"
+
+	// Configuración del mock
+	mockRepo.On("FindByName", productName).
+		Return(nil, nil).
+		Once()
+
+	// Act (ejecución)
+	err := productSvc.IncreaseStock(productName, 0)
+
+	// Assert (validación)
+	assert.Error(t, err) // Verifica que se retorne un error
+	assert.Equal(t, "producto no encontrado", err.Error())
+	mockRepo.AssertExpectations(t) // Verifica que se llamaron las expectativas del mock
+
+}
