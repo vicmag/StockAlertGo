@@ -14,6 +14,10 @@ type MockProductRepository struct {
 
 func (m *MockProductRepository) FindByName(name string) (*model.Product, error){
 	args := m.Called(name)
+	if args.Get(0) ==nil {
+		return nil, args.Error(1)
+	}
+	
 	return args.Get(0).(*model.Product), args.Error(1)
 }
 
@@ -71,7 +75,7 @@ func TestIncrementStock_ProductoNoEncontrado(t *testing.T){
 		Once()
 
 	// Act (ejecución)
-	err := productSvc.IncreaseStock(productName, 0)
+	err := productSvc.IncreaseStock(productName, 5)
 
 	// Assert (validación)
 	assert.Error(t, err) // Verifica que se retorne un error
