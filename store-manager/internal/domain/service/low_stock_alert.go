@@ -5,6 +5,8 @@ import (
 	"store-manager/internal/domain/repository"
 )
 
+var ErrProductoNoEncontrado = errors.New("producto no encontrado")
+
 type ProductService struct {
 	productRepository repository.ProductRepository
 }
@@ -16,7 +18,7 @@ func NewProductService(repo repository.ProductRepository) *ProductService{
 func (s *ProductService) IncreaseStock(name string, increment int) error {
 	product, _ := s.productRepository.FindByName(name)
 	if product == nil {
-		return errors.New("producto no encontrado")
+		return ErrProductoNoEncontrado
 	}
 	product.Stock += increment
 	s.productRepository.Save(product)
