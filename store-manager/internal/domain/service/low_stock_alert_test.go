@@ -14,6 +14,10 @@ type MockProductRepository struct{
 
 func (m *MockProductRepository) FindByName(name string) (*model.Product, error){
 	args := m.Called(name)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
 	return args.Get(0).(*model.Product), args.Error(1)
 }
 
@@ -56,4 +60,27 @@ func TestCuandoIncrementoElStockDelProductoEntoncesSeAlmacenaCorrectamente(t *te
 
 	//Assert (Verificación)
 	mockRepo.AssertExpectations(t)
+}
+
+func TestCuandoIncrementoElStockDeUnProductoInexistent_EntoncesObtentoUnError(t *testing.T){
+	// Arrange (Configuración)
+	mockRepo := new(MockProductRepository)
+	productService := service.NewProductService(mockRepo)
+
+	productName := "Camiseta"	
+	increment := 5
+
+	//Configuración de expectativas
+	mockRepo.On("FindByName", productName).
+		Return(nil, nil).
+		Once()
+
+	// Act (Ejecución)
+	err := productService.IncrementStock(productName, increment)
+
+	// Assert (Verificación)
+	assert.Error(t, err)
+	assert.Equal(t, "producto no encontrado", err.Error())
+	mockRepo.AssertExpectations(t)
+
 }
