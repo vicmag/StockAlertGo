@@ -12,6 +12,19 @@ type MockProductRepository struct{
 	mock.Mock
 }
 
+type testContext struct {
+	mockRepo *MockProductRepository
+	productService *service.ProductService
+}
+
+func setup() testContext {
+	mockRepo := new(MockProductRepository)
+	productService := service.NewProductService(mockRepo)
+	return testContext{
+		mockRepo: mockRepo,
+		productService: productService}
+}
+
 func (m *MockProductRepository) FindByName(name string) (*model.Product, error){
 	args := m.Called(name)
 	if args.Get(0) == nil {
@@ -28,8 +41,7 @@ func (m *MockProductRepository) Save(product *model.Product) error {
 
 func TestCuandoIncrementoElStockDelProductoEntoncesSeAlmacenaCorrectamente(t *testing.T){
 	//Arrange (Configuración)
-	mockRepo := new(MockProductRepository)
-	productService := service.NewProductService(mockRepo)
+	ctx := setup()
 
 	productName := "Camiseta"
 	initialStock := 10
@@ -41,11 +53,11 @@ func TestCuandoIncrementoElStockDelProductoEntoncesSeAlmacenaCorrectamente(t *te
 	}
 
 	//Configuración de expectativas
-	mockRepo.On("FindByName", productName).
+	ctx.mockRepo.On("FindByName", productName).
 		Return(product, nil).
 		Once()
 	
-	mockRepo.On("Save", product).
+	ctx.mockRepo.On("Save", product).
 		Run(
 			func(args mock.Arguments){
 				p := args.Get(0).(*model.Product)
@@ -56,31 +68,69 @@ func TestCuandoIncrementoElStockDelProductoEntoncesSeAlmacenaCorrectamente(t *te
 
 
 	//Act (Ejecución)
-	productService.IncrementStock(productName, increment)
+	ctx.productService.IncrementStock(productName, increment)
 
 	//Assert (Verificación)
-	mockRepo.AssertExpectations(t)
+	ctx.mockRepo.AssertExpectations(t)
 }
 
-func TestCuandoIncrementoElStockDeUnProductoInexistent_EntoncesObtentoUnError(t *testing.T){
+func TestCuandoIncrementoElStockDeUnProductoInexistent_EntoncesObtengoUnError(t *testing.T){
 	// Arrange (Configuración)
-	mockRepo := new(MockProductRepository)
-	productService := service.NewProductService(mockRepo)
+	ctx := setup()
 
 	productName := "Camiseta"	
 	increment := 5
 
 	//Configuración de expectativas
-	mockRepo.On("FindByName", productName).
+	ctx.mockRepo.On("FindByName", productName).
 		Return(nil, nil).
 		Once()
 
 	// Act (Ejecución)
-	err := productService.IncrementStock(productName, increment)
+	err := ctx.productService.IncrementStock(productName, increment)
 
 	// Assert (Verificación)
 	assert.Error(t, err)
 	assert.Equal(t, "producto no encontrado", err.Error())
-	mockRepo.AssertExpectations(t)
+	ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
+	ctx.mockRepo.AssertExpectations(t)
+
+}
+
+func TestCuandoElStockEsNegativoEntoncesError(t *testing.T) {
+	//Arrange (Configuración)
+	ctx := setup()
+
+	productName := "Camiseta"	
+	increment := -5
+
+	// Act (Ejecución)
+	err := ctx.productService.IncrementStock(productName, increment)
+
+	// Assert (Verificación)}
+	assert.Error(t, err)
+	assert.Equal(t, "El incremento  ser positivo", err.Error())
+
+	ctx.mockRepo.AssertNotCalled(t, "FindByName", mock.Anything)
+	ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
+
+}
+
+func TestCuandoElStockEsCeroEntoncesError(t *testing.T) {
+	//Arrange (Configuración)
+	ctx := setup()
+
+	productName := "Camiseta"	
+	increment := 0
+
+	// Act (Ejecución)
+	err := ctx.productService.IncrementStock(productName, increment)
+
+	// Assert (Verificación)}
+	assert.Error(t, err)
+	assert.Equal(t, "El incremento  ser positivo", err.Error())
+
+	ctx.mockRepo.AssertNotCalled(t, "FindByName", mock.Anything)
+	ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
 
 }

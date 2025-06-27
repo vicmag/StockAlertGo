@@ -14,6 +14,10 @@ func NewProductService(repo repository.ProductRepository) *ProductService {
 
 
 func (s *ProductService) IncrementStock(name string, increment int) error {
+	if increment <= 0{
+		return errors.New("El incremento  ser positivo")
+	}
+
 	product, _ := s.productRepository.FindByName(name)
 	if product == nil {
 		return errors.New("producto no encontrado")
