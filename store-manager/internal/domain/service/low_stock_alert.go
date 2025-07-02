@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"store-manager/internal/domain/repository"
 	"store-manager/internal/domain/model"
 )
@@ -16,6 +17,10 @@ func NewProductService(repository repository.ProductRepository) *ProductService{
 func (s *ProductService) IncrementStock(name string, increment int) error {
 	//Implementación de la Fase Verde
 	product,_ := s.productRepository.FindByName(name)
+	if product == nil {
+		return errors.New("Producto no encontrado")
+	}
+
 	s.updateStock(product, increment)
 	s.productRepository.Save(product)
 	return nil
