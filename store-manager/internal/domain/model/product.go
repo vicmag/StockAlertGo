@@ -1,5 +1,6 @@
 package model
-type Product struct {	
-	Name  string
+
+type Product struct{
+	Name string
 	Stock int
 }
