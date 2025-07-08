@@ -11,7 +11,13 @@ func NewProductService(repo repository.ProductRepository) *ProductService{
 
 }
 
-func (s *ProductService) IncrementStock(nameame string, increment int) error{
-	//Impletanción vacia. Fase Roja
+func (s *ProductService) IncrementStock(name string, increment int) error{
+	//Fase Verde
+	product, _ := s.productRepository.FindByName(name)
+	
+	product.Stock += increment
+	
+	s.productRepository.Save(product)
+
 	return nil
 }

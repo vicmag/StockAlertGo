@@ -38,14 +38,16 @@ func Test_DeberíaAlmacenarceCorrecamenta_AlExistirElProducto(t *testing.T){
 
 	//Configuración del expectativos del mock
 	mockRepo.On("FindByName", productName).
-		Return(product,nil)
+		Return(product,nil).
+		Once()
 
 	mockRepo.On("Save",mock.AnythingOfType("*model.Product")).
 		Run(func(args mock.Arguments) { 
 			p := args.Get(0).(*model.Product)
 			assert.Equal(t, initialStock+increment, p.Stock)
 		}).
-		Return(nil)
+		Return(nil).
+		Once()
 	
 	productService := service.NewProductService(mockRepo)
 
