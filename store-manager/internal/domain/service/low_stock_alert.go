@@ -16,7 +16,8 @@ func NewProductService(repo repository.ProductRepository) *ProductService{
 
 func (s *ProductService) IncrementStock(name string, increment int) error{
 	//Fase Verde
-	product, _ := s.productRepository.FindByName(name)	
+	product, _ := s.productRepository.FindByName(name)
+		
 	if product == nil {
 		return errors.New("producto no encontrado")
 	}

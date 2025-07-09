@@ -8,6 +8,19 @@ import (
 	"store-manager/internal/domain/service"
 )
 
+
+type testContext struct{
+	mockRepo *MockProductRepository
+	productService *service.ProductService
+}
+
+func setup() testContext{
+	mockRepo := new(MockProductRepository)
+	productService := service.NewProductService(mockRepo)
+
+	return testContext{mockRepo: mockRepo, productService: productService}
+}
+
 type MockProductRepository struct{
 	mock.Mock
 }
@@ -25,65 +38,62 @@ func (m *MockProductRepository) Save(product *model.Product) error{
 	return args.Error(0)
 }
 
-func Test_DeberíaAlmacenarceCorrecamenta_AlExistirElProducto(t *testing.T){
-	//Estructura (Patrón) AAA
-	//Arrange (configuración)
-	productName := "Producto Inexistente"
-	initialStock := 10
-	increment := 5
+func TestIncrementStockCases(t *testing.T) {
+	t.Run("debería almacenarse correctamente al existir el producto", func(t *testing.T) {
+		//Estructura (Patrón) AAA
+		//Arrange (configuración)
+		ctx := setup()
+		productName := "Producto Inexistente"
+		initialStock := 10
+		increment := 5
 
-	product := &model.Product{
-		Name: productName,
-		Stock: initialStock,
-	}
+		product := &model.Product{
+			Name: productName,
+			Stock: initialStock,
+		}
 
-	mockRepo := new(MockProductRepository)
+		//Configuración del expectativos del mock
+		ctx.mockRepo.On("FindByName", productName).
+			Return(product,nil).
+			Once()
 
-	//Configuración del expectativos del mock
-	mockRepo.On("FindByName", productName).
-		Return(product,nil).
-		Once()
+			ctx.mockRepo.On("Save",mock.AnythingOfType("*model.Product")).
+			Run(func(args mock.Arguments) { 
+				p := args.Get(0).(*model.Product)
+				assert.Equal(t, initialStock+increment, p.Stock)
+			}).
+			Return(nil).
+			Once()
+		
 
-	mockRepo.On("Save",mock.AnythingOfType("*model.Product")).
-		Run(func(args mock.Arguments) { 
-			p := args.Get(0).(*model.Product)
-			assert.Equal(t, initialStock+increment, p.Stock)
-		}).
-		Return(nil).
-		Once()
-	
-	productService := service.NewProductService(mockRepo)
+		//Act (ejecución)
+		ctx.productService.IncrementStock(productName, increment)
 
-	//Act (ejecución)
-	productService.IncrementStock(productName, increment)
+		//Assert (validación)
+		ctx.mockRepo.AssertExpectations(t)
+	})
 
-	//Assert (validación)
-	mockRepo.AssertExpectations(t)
+	t.Run("debería enviar error al no existir el producto", func(t *testing.T) {
+		//Estructura (Patrón) AAA
+		//Arrange (configuración)
+		ctx := setup()
+		productName := "Camiseta"
+		increment := 5
 
+		//Configuración del expectativos del mock
+		ctx.mockRepo.On("FindByName", productName).
+			Return(nil,nil).
+			Once()
+
+
+		//Act (ejecución)
+		err := ctx.productService.IncrementStock(productName, increment)
+
+		//Assert (validación)
+		assert.Error(t, err)
+		assert.Equal(t, "producto no encontrado", err.Error())
+		ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
+		ctx.mockRepo.AssertExpectations(t)
+	})
 }
 
-func Test_DeberíaEnviarError_AlNoExistirElProducto(t *testing.T){
-	//Estructura (Patrón) AAA
-	//Arrange (configuración)
-	productName := "Camiseta"
-	increment := 5
-
-
-	mockRepo := new(MockProductRepository)
-
-	//Configuración del expectativos del mock
-	mockRepo.On("FindByName", productName).
-		Return(nil,nil).
-		Once()
-	
-	productService := service.NewProductService(mockRepo)
-
-	//Act (ejecución)
-	err := productService.IncrementStock(productName, increment)
-
-	//Assert (validación)
-	assert.Error(t, err)
-	assert.Equal(t, "producto no encontrado", err.Error())
-	mockRepo.AssertExpectations(t)
-
-}
