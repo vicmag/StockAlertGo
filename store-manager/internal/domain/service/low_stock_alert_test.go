@@ -95,5 +95,40 @@ func TestIncrementStockCases(t *testing.T) {
 		ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
 		ctx.mockRepo.AssertExpectations(t)
 	})
+
+
+	t.Run("debería enviar error al considerar un incremento es negativo", func(t *testing.T) {
+		//Arrange (configuración)
+		ctx := setup()
+		productName := "ProductoX"
+		increment := -5
+
+		//Act (ejecución)
+		err := ctx.productService.IncrementStock(productName, increment)
+
+		//Assert (validación)
+		assert.Error(t, err)
+		assert.Equal(t, "incremento debe ser positivo", err.Error())
+		ctx.mockRepo.AssertNotCalled(t, "FindByName", mock.Anything)
+		ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
+		ctx.mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("debería enviar error al considerar un incremento es cero", func(t *testing.T) {
+		//Arrange (configuración)
+		ctx := setup()
+		productName := "ProductoX"
+		increment := 0
+
+		//Act (ejecución)
+		err := ctx.productService.IncrementStock(productName, increment)
+
+		//Assert (validación)
+		assert.Error(t, err)
+		assert.Equal(t, "incremento debe ser positivo", err.Error())
+		ctx.mockRepo.AssertNotCalled(t, "FindByName", mock.Anything)
+		ctx.mockRepo.AssertNotCalled(t, "Save", mock.Anything)
+		ctx.mockRepo.AssertExpectations(t)
+	})
 }
 

@@ -5,6 +5,10 @@ import (
 	"errors"
 )
 
+const errProductNotFound = "producto no encontrado"
+const errIncrementMustBePositive = "incremento debe ser positivo"
+
+
 type ProductService struct{
 	productRepository repository.ProductRepository
 }
@@ -14,13 +18,16 @@ func NewProductService(repo repository.ProductRepository) *ProductService{
 
 }
 
-func (s *ProductService) IncrementStock(name string, increment int) error{
-	//Fase Verde
-	product, _ := s.productRepository.FindByName(name)
-		
+func (s *ProductService) IncrementStock(name string, increment int) error{		
+	if increment <= 0 {
+		return errors.New(errIncrementMustBePositive)
+	}	
+
+	product, _ := s.productRepository.FindByName(name)		
 	if product == nil {
-		return errors.New("producto no encontrado")
+		return errors.New(errProductNotFound)
 	}
+
 	product.Stock += increment	
 	s.productRepository.Save(product)
 
