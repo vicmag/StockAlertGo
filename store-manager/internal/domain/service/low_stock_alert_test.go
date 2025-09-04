@@ -38,12 +38,12 @@ func TestIncrementStock(t *testing.T){
 
 	//Definción de los stubs (Expectativas para Go) para Buscar (FindByName) y Guardar (Save)
 	mockRepo.On("FindByName", productName).
-		Return(product).
+		Return(product, nil).
 		Once()
 	
 	mockRepo.On("Save", mock.AnythingOfType("*model.Product")).
 		Run(func(args mock.Arguments){
-			p := args.Get(0).(model.Product)
+			p := args.Get(0).(*model.Product)
 			assert.Equal(t, initialSotck + increment, p.Stock )
 		}).
 		Return(nil).
