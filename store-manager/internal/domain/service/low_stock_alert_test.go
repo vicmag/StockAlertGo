@@ -23,7 +23,7 @@ func (m *MockProductRepository) Save(product *model.Product) error {
 	return args.Error(0)
 }
 
-func TestIncrementStock(t *testing.T){
+func Test_DeberíaAlmacenarCorrectamente_AlExistirElProducto(t *testing.T){
 	//Arrange (configuración)
 	productName := "Camiseta"
 	initialSotck := 10
