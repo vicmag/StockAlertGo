@@ -1,0 +1,5 @@
+mode: set
+store-manager/internal/domain/service/low_stock_alert.go:13.74,15.2 1 1
+store-manager/internal/domain/service/low_stock_alert.go:17.75,19.19 2 1
+store-manager/internal/domain/service/low_stock_alert.go:19.19,21.3 1 1
+store-manager/internal/domain/service/low_stock_alert.go:22.2,24.13 3 1

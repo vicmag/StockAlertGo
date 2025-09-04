@@ -15,6 +15,9 @@ type MockProductRepository struct{
 
 func (m *MockProductRepository) FindByName(name string) (*model.Product, error){
 	args := m.Called(name)
+	if args.Get(0) == nil{
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*model.Product), args.Error(1)
 }
 
@@ -55,5 +58,28 @@ func Test_DeberíaAlmacenarCorrectamente_AlExistirElProducto(t *testing.T){
 	productService.IncrementStock(productName, increment)
 
 	//Assert (validación)
+	mockRepo.AssertExpectations(t)
+}
+
+func Test_DeberíaEnviarError_AlNoExistirElProducto(t *testing.T){
+	//Arrange (configuración)
+	productName := "No Existente"
+	increment := 5
+
+	mockRepo := new(MockProductRepository)
+
+	//Definción de los stubs (Expectativas para Go) para Buscar (FindByName) y Guardar (Save)
+	mockRepo.On("FindByName", productName).
+		Return(nil, nil).
+		Once()
+	
+	productService := service.NewProductService(mockRepo)
+
+	//Act (ejecución)
+	err := productService.IncrementStock(productName, increment)
+
+	//Assert (validación)
+	assert.Error(t, err)
+	assert.Equal(t,"producto no encontrado",err.Error())
 	mockRepo.AssertExpectations(t)
 }
