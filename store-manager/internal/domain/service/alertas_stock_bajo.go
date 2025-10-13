@@ -1,12 +1,8 @@
 package service
 
-import (
-	"store-manager/internal/domain/repository"
-	"errors"
-)
+import ("store-manager/internal/domain/repository")
 
-
-type ProductService struct{
+type ProductService struct {
 	productRepository repository.ProductRepository
 }
 
@@ -16,10 +12,8 @@ func NewProductService(repo repository.ProductRepository) *ProductService{
 
 func (s *ProductService) IncrementStock(name string, increment int) error {
 	product, _ := s.productRepository.FindByName(name)
-	if product == nil{
-		return errors.New("producto no encontrado")
-	}
 	product.Stock += increment
 	s.productRepository.Save(product)
-	return  nil
+
+	return nil
 }
