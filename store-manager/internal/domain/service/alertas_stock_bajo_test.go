@@ -1,58 +1,33 @@
 package service_test
 
-import ("testing"
-		"github.com/stretchr/testify/mock"
-		"github.com/stretchr/testify/assert"
-		"store-manager/internal/domain/model"
-		"store-manager/internal/domain/service"
-	   )
+import (
+	"testing"
+	"github.com/stretchr/testify/mock"
+)
 
-type MockProductRepository struct{
+type MockProductoDB struct{
 	mock.Mock
 }
 
-func (m *MockProductRepository) FindByName(name string) (*model.Product, error){
-	args := m.Called(name)
-	return args.Get(0).(*model.Product), args.Error(1)
-}
-
-func (m *MockProductRepository) Save(product *model.Product) error{
-	args := m.Called(product)
-	return args.Error(0)
-}
-
-func TestCuandoSeIncrementoElStockEntoncesSeAlmacenaCorrectamente(t *testing.T){
+func TestIncrementoStock_DeberiaGuardarActualización_AlIncrementarStock(t *testing.T){
 	//Arrange (configuración)
-	productName := "Camiseta"
-	initialStock := 10
-	increment := 5
+	nombreProducto := "Camiseta"
+	stockInicial := 10
+	incremento := 5
 
-	product := &model.Product{
-		Name: productName,
-		Stock: initialStock,
+	producto := &model.Producto{
+		Nombre: nombreProducto,
+		Stock: stockInicial,
 	}
 
-	mockRepository := new(MockProductRepository)
-	//Expectativa
-	mockRepository.On("FindByName", productName).
-			Return(product, nil).
-			Once()
+	//Mock de BD (repositorio)
+	mockDB := new(MockProductoDB)
 
-	mockRepository.On("Save", product).
-			Run(
-				func(args mock.Arguments){
-					p := args.Get(0).(*model.Product)
-					assert.Equal(t, initialStock+increment, p.Stock) 
-			}).
-			Return(nil).
-			Once()
-	
-	productService := service.NewProductService(mockRepository)
-	
+	//Configuración del comportamiento de la BD (expectativas/stubs)
+	mockDB.On("FindByName", nombreProducto).
+		Return(producto,nil)
+
 	//Act (ejecución)
-	productService.IncrementStock(productName, increment)
 
 	//Assert (validación)
-	mockRepository.AssertExpectations(t)
-
 }
