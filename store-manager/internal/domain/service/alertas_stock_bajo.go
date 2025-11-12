@@ -11,6 +11,10 @@ func NewProductService(db repository.ProductoDB) *ProductService{
 }
 
 func (s *ProductService) IncrementaStock(nombre string, incremento int) error {
-	//Implementación vacia. Fase Roja
+	//Fase Verde
+	producto,_ := s.productoDB.FindByName(nombre)
+	producto.Stock += incremento
+	s.productoDB.Save(producto)
+
 	return nil
 }

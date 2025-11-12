@@ -41,7 +41,7 @@ func TestIncrementoStock_DeberiaGuardarActualización_AlIncrementarStock(t *test
 		Return(producto,nil).
 		Once()
 
-	mockDB.On("Save", mock.AnythingOfType("model.Producto")).
+	mockDB.On("Save", mock.AnythingOfType("*model.Producto")).
 		Run(func(args mock.Arguments){
 			p := args.Get(0).(*model.Producto)
 			assert.Equal(t, stockInicial+incremento, p.Stock)
