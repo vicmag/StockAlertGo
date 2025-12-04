@@ -12,5 +12,9 @@ func NewProductService(db repository.ProductRepository) *ProductService{
 
 
 func (s* ProductService) IncrementStock(name string, increment int) error {
+	product,_ := s.productDB.FindByName(name)
+	product.Stock += increment
+	s.productDB.Save(product)
+	
 	return nil
 }
