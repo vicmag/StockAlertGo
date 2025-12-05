@@ -5,12 +5,21 @@ import "store-manager/internal/domain/ports"
 // ProductService - Estructura mínima
 type ProductService struct {
     repo ports.ProductRepository
+    notifier  ports.NotifierService // ← NUEVO: Servicio de notificación
 }
 
 // NewProductService - Constructor mínimo
 func NewProductService(repo ports.ProductRepository) *ProductService {
     return &ProductService{
         repo: repo,
+        notifier: nil, // ← Sin notificador por defecto
+    }
+}
+
+func NewProductServiceWithNotifier(repo ports.ProductRepository, notifier ports.NotifierService) *ProductService {
+    return &ProductService{
+        repo:     repo,
+        notifier: notifier,
     }
 }
 
