@@ -62,7 +62,7 @@ func TestDecrementStock_WhenProductExists_ShouldDecrementStock(t *testing.T) {
         Return(nil).
         Once()
    
-    service := services.NewProductService(mockRepo)
+    service := services.NewProductServiceWithoutNotifier(mockRepo)
    
     // Act
     err := service.DecrementStock(productName, decrementAmount)
@@ -108,7 +108,7 @@ func TestDecrementStock_WhenStockFallsBelowMinimum_ShouldSendAlert(t *testing.T)
         Once()
    
     // Crear servicio con notificador (ERROR: constructor no acepta notificador)
-    service := services.NewProductServiceWithNotifier(mockRepo, mockNotifier)
+    service := services.NewProductService(mockRepo, mockNotifier)
    
     // When
     err := service.DecrementStock(productName, decrementAmount)
