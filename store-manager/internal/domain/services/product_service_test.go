@@ -43,7 +43,7 @@ func TestDecrementStock_WhenProductExists_ShouldDecrementStock(t *testing.T){
 		Once()
 
 	mockRepo.On("Save",mock.MatchedBy(func(p *models.Product) bool {
-		return p.Stock == finalStock
+			return p.Stock == finalStock
 		})).
 		Return(nil).
 		Once()

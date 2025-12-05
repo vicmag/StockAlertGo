@@ -13,5 +13,11 @@ func NewProductService(db interfaces.ProductRepository) *ProductService {
 }
 
 func (s *ProductService) DecrementStock(name string, decrement int) error {
-	panic("No implementado. Fase Roja")
+	product, _ := s.repo.FindByName(name)
+
+	product.Stock -= decrement
+
+	_ = s.repo.Save(product)
+
+	return nil
 }
